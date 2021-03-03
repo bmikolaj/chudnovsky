@@ -4,12 +4,16 @@ import sys
 
 
 
-# Basic recursive factorial calculation. For large n switch to iterative.
+# Calculates factorial using loop instead of recursion to avoid stack limit
 def fact(n):
     if n == 0:
         return 1
     else:
-        return n * fact(n - 1)
+        res = 1
+        for i in range(1,n+1):
+            res = res*i
+
+        return res
 
 # Keeps a running list of previously calculated denominators
 den_list = []
@@ -61,10 +65,6 @@ def digit_compare(a, b):
 
 
 def main():
-
-    # Current Precision Limit
-    # ~2300 due to recursive limit on factorial function
-
     precision = int(sys.argv[1]) # 1st argument sets decimal precision
     mp.dps = precision  # set number of digits of precision for pi
     decimal.getcontext().prec = precision  # set significant figures for decimal numbers
