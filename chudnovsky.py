@@ -1,7 +1,6 @@
 import decimal
-
-# for reference, the first 100 digits of pi
-pi = decimal.Decimal('3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679')
+from mpmath import mp
+import sys
 
 
 # Basic recursive factorial calculation. For large n switch to iterative.
@@ -29,16 +28,53 @@ def num(root_precision):
     decimal.getcontext().prec = root_precision
     d = decimal.Decimal(10005).sqrt()
     decimal.getcontext().prec = p
-    print(d)
+    #print(d)
     return 426880 * decimal.Decimal(10005).sqrt()
     
 
 # Calculates the Chudnovsky Algorithm for a given k, and precision.
 def chudnovsky(k, root_precision):
     return num(root_precision)/den(k)
-  
-# Example usage
-decimal.getcontext().prec = 100 # set 100 significant figures for decimal numbers
-pi_estimate = chudnovsky(0, 100)
-error = pi_estimate - pi
-print('Error: {}'.format(error))
+
+# Returns which digit of pi is errant in a using b as a reference
+def digit_compare(a, b):
+    a = str(a)
+    b = str(b)
+
+    digit = 0
+    for i,d in enumerate(a):
+        if d == '.':
+            continue
+        if b[i]==d:
+            digit+=1
+        else:
+            return digit
+
+
+def main():
+    precision = int(sys.argv[1]) # 1st argument sets decimal precision
+    # for reference, the first 100 digits of pi
+    # pi = decimal.Decimal('3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679')
+    mp.dps = precision  # set number of digits of precision
+    decimal.getcontext().prec = precision  # set significant figures for decimal numbers
+    pi = mp.pi
+
+    k=0
+    prev_error = 0
+    while True:
+        print("k =",k)
+        pi_estimate = chudnovsky(k, precision)
+        print(pi_estimate)
+        error = digit_compare(pi_estimate, pi)
+        print('Error: {}th digit'.format(error))
+
+        # a repeating digit that is errant implies the end of precision
+        if prev_error == error:
+            break
+        else: # keep calculating
+            k+=1
+            prev_error = error
+
+
+if __name__ == '__main__':
+    main()
