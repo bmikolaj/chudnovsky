@@ -3,6 +3,7 @@ from mpmath import mp
 import sys
 
 
+
 # Basic recursive factorial calculation. For large n switch to iterative.
 def fact(n):
     if n == 0:
@@ -10,17 +11,25 @@ def fact(n):
     else:
         return n * fact(n - 1)
 
+# Keeps a running list of previously calculated denominators
+den_list = []
 
 # Denominator- Calculates the sum from 0 to k.
-def den(k):
-    a = decimal.Decimal(fact(6*k)*(545140134*k+13591409))
-    b = decimal.Decimal(fact(3*k)*(fact(k)**3)*((-262537412640768000)**k))
-    res = a / b
-    if k > 0:
-        return res + den(k - 1)
-    else:
-        return res
+def den(k_large):
+    result = 0
+    for k in range(0,k_large+1):
+        # If k exists in the denominator list, retrieve that result instead of calculating
+        if len(den_list) > 0 and len(den_list) > k:
+            result+=den_list[k]
+        else: # calculate
+            a = decimal.Decimal(fact(6*k)*(545140134*k+13591409))
+            b = decimal.Decimal(fact(3*k)*(fact(k)**3)*((-262537412640768000)**k))
+            res = a / b
+            result+=res
+            if len(den_list) == k: # Store result in den_list
+                den_list.append(res)
 
+    return result
 
 # Numerator- root_precision is the number of significant digits to use when calculating the root.
 def num(root_precision):
@@ -52,10 +61,12 @@ def digit_compare(a, b):
 
 
 def main():
+
+    # Current Precision Limit
+    # ~2300 due to recursive limit on factorial function
+
     precision = int(sys.argv[1]) # 1st argument sets decimal precision
-    # for reference, the first 100 digits of pi
-    # pi = decimal.Decimal('3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679')
-    mp.dps = precision  # set number of digits of precision
+    mp.dps = precision  # set number of digits of precision for pi
     decimal.getcontext().prec = precision  # set significant figures for decimal numbers
     pi = mp.pi
 
