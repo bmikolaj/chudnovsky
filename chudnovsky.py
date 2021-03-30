@@ -1,10 +1,11 @@
 import decimal
 from mpmath import mp
 import sys
-
+from functools import lru_cache
 
 
 # Calculates factorial using loop instead of recursion to avoid stack limit
+@lru_cache(maxsize=None)
 def fact(n):
     if n == 0:
         return 1
@@ -15,23 +16,16 @@ def fact(n):
 
         return res
 
-# Keeps a running list of previously calculated denominators
-den_list = []
 
 # Denominator- Calculates the sum from 0 to k.
+@lru_cache(maxsize=None)
 def den(k_large):
     result = 0
     for k in range(0,k_large+1):
-        # If k exists in the denominator list, retrieve that result instead of calculating
-        if len(den_list) > 0 and len(den_list) > k:
-            result+=den_list[k]
-        else: # calculate
-            a = decimal.Decimal(fact(6*k)*(545140134*k+13591409))
-            b = decimal.Decimal(fact(3*k)*(fact(k)**3)*((-262537412640768000)**k))
-            res = a / b
-            result+=res
-            if len(den_list) == k: # Store result in den_list
-                den_list.append(res)
+        a = decimal.Decimal(fact(6*k)*(545140134*k+13591409))
+        b = decimal.Decimal(fact(3*k)*(fact(k)**3)*((-262537412640768000)**k))
+        res = a / b
+        result+=res
 
     return result
 
@@ -73,16 +67,16 @@ def main():
     k=0
     prev_error = 0
     while True:
-        print("k =",k)
         pi_estimate = chudnovsky(k, precision)
-        print(pi_estimate)
         error = digit_compare(pi_estimate, pi)
-        print('Error: {}th digit'.format(error))
 
         # a repeating digit that is errant implies the end of precision
         if prev_error == error:
             break
-        else: # keep calculating
+        else: # print and keep calculating
+            print("k =", k)
+            print(pi_estimate)
+            print('Error: {}th digit'.format(error))
             k+=1
             prev_error = error
 
