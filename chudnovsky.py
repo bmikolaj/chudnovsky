@@ -37,10 +37,10 @@ def den(k_large):
 
 # Numerator- root_precision is the number of significant digits to use when calculating the root.
 def num(root_precision):
-    p = decimal.getcontext().prec
-    decimal.getcontext().prec = root_precision
-    d = decimal.Decimal(10005).sqrt()
-    decimal.getcontext().prec = p
+    #p = decimal.getcontext().prec
+    #decimal.getcontext().prec = root_precision
+    #d = decimal.Decimal(10005).sqrt()
+    #decimal.getcontext().prec = p
     #print(d)
     return 426880 * decimal.Decimal(10005).sqrt()
     
@@ -58,7 +58,7 @@ def digit_compare(a, b):
     for i,d in enumerate(a):
         if d == '.':
             continue
-        if b[i]==d:
+        if b[i] == d:
             digit+=1
         else:
             return digit
@@ -66,7 +66,7 @@ def digit_compare(a, b):
 
 def main():
     precision = int(sys.argv[1]) # 1st argument sets decimal precision
-    mp.dps = precision  # set number of digits of precision for pi
+    mp.dps = precision+1  # set number of digits of precision for pi
     decimal.getcontext().prec = precision  # set significant figures for decimal numbers
     pi = mp.pi
 
